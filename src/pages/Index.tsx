@@ -28,18 +28,17 @@ const Index = () => {
     const newAnswers = [...quizState.answers];
     newAnswers[quizState.currentQuestionIndex] = answerIndex;
 
-    setTimeout(() => {
-      setQuizState(prev => ({
-        ...prev,
-        score: isCorrect ? prev.score + 1 : prev.score,
-        currentQuestionIndex: 
-          prev.currentQuestionIndex === questions.length - 1 
-            ? prev.currentQuestionIndex 
-            : prev.currentQuestionIndex + 1,
-        isCompleted: prev.currentQuestionIndex === questions.length - 1,
-        answers: newAnswers,
-      }));
-    }, 1000);
+    // If time ran out (answerIndex === -1) or answer was selected
+    setQuizState(prev => ({
+      ...prev,
+      score: isCorrect ? prev.score + 1 : prev.score,
+      currentQuestionIndex: 
+        prev.currentQuestionIndex === questions.length - 1 
+          ? prev.currentQuestionIndex 
+          : prev.currentQuestionIndex + 1,
+      isCompleted: prev.currentQuestionIndex === questions.length - 1,
+      answers: newAnswers,
+    }));
   };
 
   const handleRestart = () => {
