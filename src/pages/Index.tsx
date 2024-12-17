@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { questions } from "../data/quiz-questions";
 import { QuizCard } from "../components/QuizCard";
 import { QuizProgress } from "../components/QuizProgress";
@@ -12,14 +12,33 @@ interface UserDetails {
   collegeName: string;
 }
 
+const STORAGE_KEY = "quizData";
+
 const Index = () => {
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [quizState, setQuizState] = useState<QuizState>({
-    currentQuestionIndex: 0,
-    score: 0,
-    isCompleted: false,
-    answers: [],
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(() => {
+    const stored = localStorage.getItem("userDetails");
+    return stored ? JSON.parse(stored) : null;
   });
+
+  const [quizState, setQuizState] = useState<QuizState>(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {
+      currentQuestionIndex: 0,
+      score: 0,
+      isCompleted: false,
+      answers: [],
+    };
+  });
+
+  useEffect(() => {
+    if (userDetails) {
+      localStorage.setItem("userDetails", JSON.stringify(userDetails));
+    }
+  }, [userDetails]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState));
+  }, [quizState]);
 
   const currentQuestion = questions[quizState.currentQuestionIndex];
 
@@ -28,7 +47,6 @@ const Index = () => {
     const newAnswers = [...quizState.answers];
     newAnswers[quizState.currentQuestionIndex] = answerIndex;
 
-    // If time ran out (answerIndex === -1) or answer was selected
     setQuizState(prev => ({
       ...prev,
       score: isCorrect ? prev.score + 1 : prev.score,
@@ -49,6 +67,8 @@ const Index = () => {
       answers: [],
     });
     setUserDetails(null);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("userDetails");
   };
 
   const handleUserDetailsSubmit = (details: UserDetails) => {
