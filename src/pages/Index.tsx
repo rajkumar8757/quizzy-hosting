@@ -3,9 +3,17 @@ import { questions } from "../data/quiz-questions";
 import { QuizCard } from "../components/QuizCard";
 import { QuizProgress } from "../components/QuizProgress";
 import { QuizComplete } from "../components/QuizComplete";
+import { UserDetailsForm } from "../components/UserDetailsForm";
 import type { QuizState } from "../types/quiz";
 
+interface UserDetails {
+  name: string;
+  rollNo: string;
+  collegeName: string;
+}
+
 const Index = () => {
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestionIndex: 0,
     score: 0,
@@ -41,14 +49,28 @@ const Index = () => {
       isCompleted: false,
       answers: [],
     });
+    setUserDetails(null);
   };
+
+  const handleUserDetailsSubmit = (details: UserDetails) => {
+    setUserDetails(details);
+    console.log("User details submitted:", details);
+  };
+
+  if (!userDetails) {
+    return <UserDetailsForm onSubmit={handleUserDetailsSubmit} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
       <div className="container max-w-4xl mx-auto space-y-8">
-        <h1 className="text-4xl font-bold text-center text-primary mb-12">
-          Fun Quiz Time!
-        </h1>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-primary">Fun Quiz Time!</h1>
+          <p className="text-gray-600">Welcome, {userDetails.name}!</p>
+          <p className="text-sm text-gray-500">
+            {userDetails.rollNo} | {userDetails.collegeName}
+          </p>
+        </div>
 
         {!quizState.isCompleted ? (
           <>
